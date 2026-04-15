@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int             @id @default(autoincrement())
+  email           String          @unique
+  passwordHash    String          @map("password_hash")
+  preferences     String          @default("{\"tempUnit\":\"celsius\",\"theme\":\"light\"}")
+  defaultLocationId Int?          @map("default_location_id")
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  savedLocations  SavedLocation[] @relation("UserLocations")
+  defaultLocation SavedLocation?  @relation("DefaultLocation", fields: [defaultLocationId], references: [id], onDelete: SetNull)
+
+  @@map("users")
+}
+
+model SavedLocation {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  name      String
+  lat       Float
+  lon       Float
+  country   String?
+  state     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation("UserLocations", fields: [userId], references: [id], onDelete: Cascade)
+  defaultOf User[]   @relation("DefaultLocation")
+
+  @@map("saved_locations")
+}

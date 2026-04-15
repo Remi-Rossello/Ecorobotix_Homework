@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Prisma: Delete old DB and migrate",
+			"type": "shell",
+			"command": "export PATH=\"$HOME/.nvm/versions/node/v22.22.2/bin:$PATH\" && cd packages/server && rm -f data/agriwatch.db data/agriwatch.db-wal data/agriwatch.db-shm && npx prisma migrate dev --name init 2>&1"
+		}
+	]
+}
