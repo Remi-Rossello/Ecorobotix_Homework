@@ -1,6 +1,6 @@
-# Welcome to AgriWatch !
+# Welcome to AgriWatch!
 
-AgriWatch is a digital platform used by cooperative farms across West
+AgriWatch is a digital platform used by cooperative farms across Western
 Europe to monitor weather conditions and plan agricultural activities.
 Field agents rely on the platform daily to decide when to sow, irrigate, or
 harvest.
@@ -11,7 +11,7 @@ Features:
 - Choose and save your preferred temperature units and dark/light mode.
 - The app is easily accessible from PCs, phones, or tablets.
 - You can log out or delete your account and all its data at any time.
-- Sessions otherwise stay open even if you turn off your device. No signing in every time !
+- Sessions otherwise stay open even if you turn off your device. No signing in every time!
 
 
 
@@ -43,7 +43,10 @@ Features:
   npm run setup:env    # copies .env.example → .env (won't overwrite existing)
   ```
   You can then edit `packages/server/.env` to change any values before starting the app.
-  Changing JWT_SECRET to a real password is recommended.
+  Changing JWT_SECRET to a real password is recommended:
+  ```bash
+  npm run set:secret   # prompts you for a new JWT secret and writes it to .env
+  ```
 
 
 ### Install & Run
@@ -54,7 +57,7 @@ This codebase uses a monorepo. Workspaces make it possible to install dependenci
 npm install          # installs all workspace dependencies
 npm run dev          # starts server (port 3001) + client (port 5173)
 ```
-The website can now be opened at <http://localhost:5173>. You can start by signing up at the top-right corner. Enjoy !
+The website can now be opened at <http://localhost:5173>. You can start by signing up at the top-right corner. Enjoy!
 
 ### Other Commands
 
@@ -65,6 +68,7 @@ The website can now be opened at <http://localhost:5173>. You can start by signi
 | `npm run test:client` | Client tests only                           |
 | `npm run build`       | Production build of the client              |
 | `npm start`           | Start the server in production mode         |
+| `npm run set:secret`  | Set a custom JWT secret in `.env`           |
 
 ### Environment
 
@@ -76,7 +80,7 @@ The server reads a `.env` file in `packages/server/`:
 | `JWT_SECRET` | `agriwatch-secret-key-change-in-production` | Token signing key  |
 | `DB_PATH`    | `./data/agriwatch.db`                  | SQLite database file    |
 
-A `.env.example` is provided. Copy it and adjust before deploying, as explained in the Prerequisite.
+A `.env.example` is provided. Copy it and adjust before deploying, as explained in the Prerequisites.
 
 ## Project Structure
 
@@ -125,7 +129,7 @@ packages/
 
 The Frontend is written in React and runs on Vite.
 
-Compared to older tools used to run frontends like Webpack, Vite offers the same functionnalities while being simpler to setup and faster (as the name implies in French). The speed advantage holds both during startup and Hot Module Replacement, allowing for faster design iterations.
+Compared to older tools used to run frontends like Webpack, Vite offers the same functionalities while being simpler to set up and faster (as the name implies in French). The speed advantage holds both during startup and Hot Module Replacement, allowing for faster design iterations.
 
 React is becoming an industry standard in web development, is well-supported by Vite, and is the JS framework I am most familiar with, reducing the likelihood of errors.
 
@@ -133,15 +137,15 @@ Testing: Vitest is used for testing as it works well and is naturally designed t
 
 ### Backend: Express, Vitest, supertest
 
-For the backend server, I use the Express library because it is simple, well known, and in particular it is the one I know and am confortable with. It "does the job" perfectly fine while being simple to understand and fast. Switching to a newer tool can be envisionned in the future.
+For the backend server, I use the Express library because it is simple, well known, and in particular it is the one I know and am comfortable with. It "does the job" perfectly fine while being simple to understand and fast. Switching to a newer tool can be envisioned in the future.
 
 Testing: Vitest is also used, to be homogeneous with the frontend and make the architecture simpler and easier to manage and run. The supertest module and its "require" function complement this by allowing faster server startup for tests.
 
 ### Database: SQLite, better-sqlite3, prisma
 
-I seeked the simplest solution that would satisfy the needs of this app. SQLite was the perfect choice. 
+I sought the simplest solution that would satisfy the needs of this app. SQLite was the perfect choice. 
 
-Its limitations are mainly: database size (as everything is written locally to disk), high number of concurrent writting (as the whole database is locked for every write operation), and security features. None of these three issues are currently a problem for our little app. Security of user passwords is already provided with hashing, JWT tokens and secret. Furthermore, the file-based nature of SQLite makes everything a lot simpler to design, run, and test, which is why I used it.
+Its limitations are mainly: database size (as everything is written locally to disk), high number of concurrent writing (as the whole database is locked for every write operation), and security features. None of these three issues are currently a problem for our little app. Security of user passwords is already provided with hashing, JWT tokens and secret. Furthermore, the file-based nature of SQLite makes everything a lot simpler to design, run, and test.
 
 Similarly, the `better-sqlite3` module is simpler because it is synchronous. For SQLite, this also means faster, as asynchronicity creates context switching overheads for example, and as we said, concurrency is not a critical issue for this app.
 
@@ -149,29 +153,29 @@ Prisma was used to migrate the database to a system where user preferences are s
 
 ### Search and weather APIs
 
-Photon API is used for the search feature and geocoding (going from name to latitudes/longitudes). Open-Meteo API is used to get weather forecasts from these geocoded informations. Both APIs are free, and don't require any kind of keys or registration. 
+Photon API is used for the search feature and geocoding (going from name to latitudes/longitudes). Open-Meteo API is used to get weather forecasts from these geocoded information. Both APIs are free, and don't require any kind of keys or registration. 
 
 Note: calling them directly from the browser would expose the request origin and hit CORS restrictions. Calling them from the backend solves this.
 
 ### Monorepo
 
-The project has only two packages. npm workspaces give shared `node_modules`, a single lock file, and coordinated scripts without adding Turborepo / Nx overhead. `concurrently` handles parallel dev servers. This organisation is the simplest yet most functional middle ground between no monorepo at all, and using a profesionnal tool. 
+The project has only two packages. npm workspaces give shared `node_modules`, a single lock file, and coordinated scripts without adding Turborepo / Nx overhead. `concurrently` handles parallel dev servers. This organisation is the simplest yet most functional middle ground between no monorepo at all, and using a professional tool. 
 
 ### Authentication and security
 
 The authentication features for this web app must combine simplicity with security. I thus used the simplest tech that provided good security. That is why the bcryptjs module is used to hash user passwords before storing them in the database. Additional UI features like "no password shorter than 6 characters" are used. More security features should be implemented as more users begin to use the app.
 
-Another good feature is to create sessions during which the user stays logged in even if the app is closed and re-opened. The easiest way to do that is to give the browser a "pass" on login, that it can present to the server when the app is reoened. The pass must thus persist in the browser. The easiest and most standard way to do *that* while making sure it is not possible for a user to create a pass and login to another account, is precisely to use JSON Web Tokens, with a secret key used to check and generate them stored by the server.
+Another good feature is to create sessions during which the user stays logged in even if the app is closed and re-opened. The easiest way to do that is to give the browser a "pass" on login, that it can present to the server when the app is reopened. The pass must thus persist in the browser. The easiest and most standard way to do *that* while making sure it is not possible for a user to create a pass and login to another account, is precisely to use JSON Web Tokens, with a secret key used to check and generate them stored by the server.
 
 Note: Tokens expire in 7 days only if the browser tab stays closed or opened for 7 days. Otherwise, the 7 day expiry deadline refreshes every time the user goes back to the app.
 
 ### UI Design
 
-The interface is designed to be simple yet intuitive and useful, with a white/light-green palette in light mode, similar to Ecorobotix's esthetics, and also a dark mode.
+The interface is designed to be simple yet intuitive and useful, with a white/light-green palette in light mode, similar to Ecorobotix's aesthetics, and also a dark mode.
 
-Core functionnalities are designed to visible and recognisable immediately. The Search tab is the primary interaction on the dashboard, dislaying the current weather forecast of a default location chosen by the user. The Saved Locations tab displays all the saved locations at once, in a grid pattern, and marks the default with a star. Clicking on these cards will revert back to the Search tab and display the forecasts. Forecasts can be expanded for more informations such as UV index or humidity.
+Core functionalities are designed to be visible and recognisable immediately. The Search tab is the primary interaction on the dashboard, displaying the current weather forecast of a default location chosen by the user. The Saved Locations tab displays all the saved locations at once, in a grid pattern, and marks the default with a star. Clicking on these cards will revert back to the Search tab and display the forecasts. Forecasts can be expanded for more information such as UV index or humidity.
 
-The remaining functionnalities are in the Settings tab, incuding deleting one's account, and in the account button at the top-right corner, with toast notifications on sign up/sign in and delete account.
+The remaining functionnalities are in the Settings tab, including deleting one's account, and in the account button at the top-right corner, with toast notifications on sign up/sign in and delete account.
 
 ## Improvement ideas
 
